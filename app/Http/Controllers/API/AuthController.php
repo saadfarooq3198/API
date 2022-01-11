@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\API;
 use App\Models\User;
 use App\Models\Product;
+use App\Mail\WelcomeMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Http\Resources\ProductResource;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\API\BaseController as BaseController;
-use App\Http\Resources\ProductResource;
 
 class AuthController extends BaseController
 {
@@ -42,6 +44,7 @@ class AuthController extends BaseController
         $user = User::create($input);
         $success['token'] =  $user->createToken('LaravelSanctumAuth')->plainTextToken;
         $success['name'] =  $user->name;
+        Mail::to($request->email)->send(new WelcomeMail($user));
         return $this->handleResponse($success, 'User successfully registered!');
     }
     public function product(Request $request){
